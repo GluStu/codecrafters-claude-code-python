@@ -2,8 +2,10 @@ import argparse
 import os
 import sys
 from openai import OpenAI
+from dotenv import load_dotenv
 
-API_KEY = os.getenv("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")
+load_dotenv()
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
 # is_local = os.environ.get("LOCAL", "false").lower() in ("true", "1", "yes")
 # if is_local:
