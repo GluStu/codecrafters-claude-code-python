@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 from openai import OpenAI
+import json
 # from dotenv import load_dotenv
 
 # load_dotenv()
@@ -49,6 +50,11 @@ def main():
     # TODO: Uncomment the following line to pass the first stage
     print(chat.choices[0].message.content)
 
+    for tool_call in chat.choices[0].message.tool_calls or []:
+        args = json.loads(tool_call.function.arguments)
+        if tool_call.function.name == "Read":
+            with open(args["file_path"]) as f:
+                print(f.read())
 
 if __name__ == "__main__":
     main()
