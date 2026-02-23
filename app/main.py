@@ -54,7 +54,10 @@ def main():
         args = json.loads(tool_call.function.arguments)
         if tool_call.function.name == "Read":
             with open(args["file_path"]) as f:
-                print(f.read().lstrip("\r\n"))
+                content = f.read()
+                if content.startswith("\n"):
+                    print(content[1:])
+                else: print(content)
 
 if __name__ == "__main__":
     main()
