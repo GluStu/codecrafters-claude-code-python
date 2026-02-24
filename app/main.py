@@ -3,7 +3,7 @@ import os
 import sys
 from openai import OpenAI
 import json
-
+from tools import tools
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
@@ -24,23 +24,7 @@ def main():
         chat = client.chat.completions.create(
             model=model,
             messages=message_history,
-            tools=[{
-                "type": "function",
-                "function": {
-                    "name": "Read",
-                    "description": "Read and return the contents of a file",
-                    "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "file_path": {
-                        "type": "string",
-                        "description": "The path to the file to read"
-                        }
-                    },
-                    "required": ["file_path"]
-                    }
-                }
-                }]
+            tools=tools
         )
 
         if not chat.choices or len(chat.choices) == 0:
@@ -66,6 +50,12 @@ def main():
                          "tool_call_id": tool_call.id,
                          "content": content
                         })
+                    
+            if tool_call.function.name == "Write":
+                path = args["file_path"]
+                to_write = args["content"]
+                with open(path, "w") as f:
+                    f.write(to_write)
         continue
     
 
