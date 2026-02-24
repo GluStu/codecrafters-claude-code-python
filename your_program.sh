@@ -7,7 +7,7 @@
 # Learn more: https://codecrafters.io/program-interface
 
 set -e # Exit early if any commands fail
-export OPENROUTER_API_KEY="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"
+export OPENROUTER_API_KEY="your_api_key"
 export local=true
 # Copied from .codecrafters/run.sh
 #
