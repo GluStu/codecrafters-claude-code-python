@@ -4,6 +4,7 @@ import sys
 from openai import OpenAI
 import json
 from .tools import tools
+import subprocess
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
@@ -29,7 +30,6 @@ def main():
 
         if not chat.choices or len(chat.choices) == 0:
             raise RuntimeError("no choices in response")
-        print("Logs from your program will appear here!", file=sys.stderr)
 
         message = chat.choices[0].message
         message_history.append(message)
@@ -41,29 +41,45 @@ def main():
         for tool_call in message.tool_calls or []:
             args = json.loads(tool_call.function.arguments)
 
-            if tool_call.function.name == "Read":
-                with open(args["file_path"]) as f:
-                    content = f.read()
+            match tool_call.function.name:
+
+                case "Read":
+                    with open(args["file_path"]) as f:
+                        content = f.read()
+                        
+                        message_history.append(
+                            {"role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": content
+                            })
+
+                case "Write":
+                    path = args["file_path"]
+                    to_write = args["content"]
+                    with open(path, "w") as f:
+                        f.write(to_write)
                     
                     message_history.append(
-                        {"role": "tool",
-                         "tool_call_id": tool_call.id,
-                         "content": content
-                        })
-                    
-            if tool_call.function.name == "Write":
-                path = args["file_path"]
-                to_write = args["content"]
-                with open(path, "w") as f:
-                    f.write(to_write)
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": f"Wrote to {path}",
+                        }
+                    )
                 
-                message_history.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": f"Wrote to {path}",
-                    }
-                )
+                case "Bash":
+                    command = args["command"]
+                    res = subprocess.run(command, capture_output=True)
+                    content = res.stdout
+
+                    message_history.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": content,
+                        }
+                    )
+                    
 
         continue
     
