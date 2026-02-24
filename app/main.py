@@ -51,7 +51,7 @@ def main():
         message_history.append(message)
 
         if not message.tool_calls:
-            print(message.content)
+            print(message.content.strip())
             break
 
         for tool_call in message.tool_calls or []:
@@ -66,11 +66,7 @@ def main():
                          "tool_call_id": tool_call.id,
                          "content": content
                         })
-
-        else:
-            if message:
-                print(message.content)
-
+        continue
     
 
 if __name__ == "__main__":
