@@ -56,6 +56,14 @@ def main():
                 to_write = args["content"]
                 with open(path, "w") as f:
                     f.write(to_write)
+                
+                message_history.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": f"Wrote to {path}",
+                    }
+                )
 
         continue
     
