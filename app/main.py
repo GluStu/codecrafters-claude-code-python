@@ -69,8 +69,8 @@ def main():
                 
                 case "Bash":
                     command = args["command"]
-                    res = subprocess.run(command, capture_output=True)
-                    content = res.stdout
+                    res = subprocess.run(command, shell=True, capture_output=True, text=True)
+                    content = res.stdout + res.stderr
 
                     message_history.append(
                         {
