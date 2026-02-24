@@ -3,7 +3,7 @@ import os
 import sys
 from openai import OpenAI
 import json
-from tools import tools
+from .tools import tools
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
@@ -56,6 +56,7 @@ def main():
                 to_write = args["content"]
                 with open(path, "w") as f:
                     f.write(to_write)
+
         continue
     
 
